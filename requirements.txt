@@ -1,0 +1,15 @@
+langchain
+langgraph
+langchain_google_genai
+python-dotenv
+langchain_community
+pypdf
+langchain_text_splitters
+firecrawl-py
+colorama
+rich
+typer
+click
+pyfiglet
+markdown
+google-genai

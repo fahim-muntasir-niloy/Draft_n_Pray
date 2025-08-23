@@ -1,0 +1,4 @@
+email_venv
+.env
+__pycache__/
+embedding_creator.py
