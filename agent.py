@@ -48,7 +48,6 @@ class AgentCLI:
         self.cv_path = None
 
     def print_banner(self):
-        """Display beautiful ASCII art banner"""
         banner_text = """
 
     +============================================================================================+
@@ -74,7 +73,6 @@ class AgentCLI:
         console.print(panel)
 
     def print_header(self):
-        """Display application header"""
         header = Table.grid(padding=1)
         header.add_column(style="bold cyan", justify="left")
         header.add_column(style="cyan", justify="left")
@@ -84,7 +82,6 @@ class AgentCLI:
         console.print()
 
     def check_environment(self):
-        """Check and validate environment variables"""
         console.print("🔍 Checking environment configuration...", style="yellow")
 
         required_vars = ["GOOGLE_API_KEY", "FIRECRAWL_API_KEY"]
@@ -108,7 +105,6 @@ class AgentCLI:
         return True
 
     def initialize_agent(self):
-        """Initialize the LangGraph agent"""
         try:
             with console.status("[bold green]Initializing AI Agent...", spinner="dots"):
                 llm = get_model()
@@ -125,7 +121,6 @@ class AgentCLI:
             return False
 
     def initialize_cv_knowledge_base(self):
-        """Initialize CV knowledge base with beautiful progress"""
         self.cv_path = os.getenv("CV_PATH")
 
         if not self.cv_path:
@@ -178,16 +173,6 @@ class AgentCLI:
                 "Re-initialize CV knowledge base",
                 "Use if CV changes",
             ),
-            (
-                "get_cv_stats",
-                "Get statistics about CV knowledge base",
-                "Check how many documents are loaded",
-            ),
-            (
-                "debug_vectorstore",
-                "Debug vector store issues",
-                "Troubleshoot vector store problems",
-            ),
         ]
 
         for tool, desc, usage in tools_info:
@@ -203,8 +188,6 @@ class AgentCLI:
 • [green]help[/green] - Show this help message
 • [green]tools[/green] - Show available tools
 • [green]cv[/green] - Show CV status
-• [green]cv-stats[/green] - Show CV knowledge base statistics
-• [green]debug[/green] - Debug vector store issues
 • [green]quit[/green], [green]exit[/green], [green]bye[/green] - Exit the application
 
 [bold cyan]Example Queries:[/bold cyan]
@@ -268,7 +251,7 @@ class AgentCLI:
         while True:
             try:
                 # Get user input with rich prompt
-                message = Prompt.ask("\n[bold cyan]You[/bold cyan]")
+                message = Prompt.ask("\n[bold cyan]🤠 You[/bold cyan]")
 
                 # Handle commands
                 if message.lower() in ["quit", "exit", "bye"]:
@@ -284,42 +267,6 @@ class AgentCLI:
                     continue
                 elif message.lower() == "cv":
                     self.show_cv_status()
-                    continue
-                elif message.lower() == "cv-stats":
-                    # Get CV stats using the tool
-                    try:
-                        from tools import get_cv_stats
-
-                        stats = get_cv_stats()
-                        stats_panel = Panel(
-                            stats,
-                            title="📊 CV Knowledge Base Statistics",
-                            border_style="blue",
-                            padding=(1, 2),
-                        )
-                        console.print(stats_panel)
-                    except Exception as e:
-                        console.print(
-                            f"❌ Error getting CV stats: {str(e)}", style="red"
-                        )
-                    continue
-                elif message.lower() == "debug":
-                    # Debug vector store issues using the tool
-                    try:
-                        from tools import debug_vectorstore
-
-                        debug_info = debug_vectorstore()
-                        debug_panel = Panel(
-                            debug_info,
-                            title="�� Vector Store Debug Information",
-                            border_style="red",
-                            padding=(1, 2),
-                        )
-                        console.print(debug_panel)
-                    except Exception as e:
-                        console.print(
-                            f"❌ Error running debug command: {str(e)}", style="red"
-                        )
                     continue
                 elif not message.strip():
                     continue

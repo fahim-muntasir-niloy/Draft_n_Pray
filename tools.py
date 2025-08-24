@@ -36,34 +36,6 @@ def get_or_create_vectorstore():
     return vectorstore
 
 
-def get_document_count(vectorstore):
-    """Get the actual document count from the vector store"""
-    try:
-        # Try different methods to get document count
-        if hasattr(vectorstore, "docstore") and hasattr(vectorstore.docstore, "dict"):
-            return len(vectorstore.docstore.dict)
-        elif hasattr(vectorstore, "_docstore") and hasattr(
-            vectorstore._docstore, "dict"
-        ):
-            return len(vectorstore._docstore.dict)
-        elif hasattr(vectorstore, "index_to_docstore_id"):
-            return len(vectorstore.index_to_docstore_id)
-        elif hasattr(vectorstore, "index"):
-            return len(vectorstore.index)
-        else:
-            # Try a simple search to see if documents exist
-            try:
-                test_results = vectorstore.similarity_search("test", k=1)
-                return len(test_results) if test_results else 0
-            except:
-                return 0
-    except Exception as e:
-        console.print(
-            f"⚠️  Could not determine document count: {str(e)}", style="yellow"
-        )
-        return 0
-
-
 def initialize_vectorstore_with_cv(cv_path: str):
     """Initialize the global vector store with CV content"""
     global vectorstore
@@ -110,22 +82,6 @@ def initialize_vectorstore_with_cv(cv_path: str):
         )
         vs.add_documents(chunks)
 
-        # Verify documents were added
-        total_docs = get_document_count(vs)
-        console.print(
-            f"✅ CV embeddings created successfully! Total documents: {total_docs}",
-            style="green",
-        )
-
-        if total_docs == 0:
-            console.print(
-                "⚠️  Warning: No documents were added to the vector store!", style="red"
-            )
-            console.print(
-                "💡 This might indicate an issue with the embedding process",
-                style="yellow",
-            )
-
         return True
 
     except Exception as e:
@@ -151,7 +107,7 @@ def kb_tool(query: str):
 
     # Search for relevant content in CV
     try:
-        relevant_docs = vectorstore.similarity_search(query, k=3)
+        relevant_docs = vectorstore.similarity_search(query, k=20)
 
         if not relevant_docs:
             return "No relevant content found in your CV for this query."
@@ -176,21 +132,6 @@ def kb_tool(query: str):
 def load_pdf_and_create_embeddings(pdf_path: str):
     """Load PDF and create embeddings in memory (legacy tool, use initialize_vectorstore_with_cv instead)"""
     return initialize_vectorstore_with_cv(pdf_path)
-
-
-@tool
-def get_cv_stats():
-    """Get statistics about the CV knowledge base"""
-    global vectorstore
-
-    if vectorstore is None:
-        return "❌ CV knowledge base not initialized."
-
-    try:
-        total_docs = get_document_count(vectorstore)
-        return f"## 📊 CV Knowledge Base Stats\n\n**Total Documents:** {total_docs}\n**Status:** {'✅ Active' if total_docs > 0 else '❌ Empty'}"
-    except Exception as e:
-        return f"## ❌ Error\n\nError getting stats: {str(e)}"
 
 
 @tool
@@ -235,59 +176,4 @@ def crawl_website(url: str):
         return f"## ❌ Error\n\nError crawling website: {str(e)}"
 
 
-@tool
-def debug_vectorstore():
-    """Debug the vector store to see what's happening"""
-    global vectorstore
-
-    if vectorstore is None:
-        return "❌ Vector store is None"
-
-    debug_info = []
-    debug_info.append("## 🔍 Vector Store Debug Information")
-    debug_info.append("")
-
-    try:
-        # Check vector store attributes
-        debug_info.append("### Vector Store Attributes:")
-        debug_info.append(f"- Type: {type(vectorstore)}")
-        debug_info.append(f"- Has docstore: {hasattr(vectorstore, 'docstore')}")
-        debug_info.append(f"- Has _docstore: {hasattr(vectorstore, '_docstore')}")
-        debug_info.append(f"- Has index: {hasattr(vectorstore, 'index')}")
-        debug_info.append(
-            f"- Has index_to_docstore_id: {hasattr(vectorstore, 'index_to_docstore_id')}"
-        )
-        debug_info.append("")
-
-        # Try to get document count
-        total_docs = get_document_count(vectorstore)
-        debug_info.append(f"### Document Count: {total_docs}")
-        debug_info.append("")
-
-        # Try a test search
-        debug_info.append("### Test Search Results:")
-        try:
-            test_results = vectorstore.similarity_search("test", k=1)
-            debug_info.append(f"- Test search returned: {len(test_results)} results")
-            if test_results:
-                debug_info.append(
-                    f"- First result content length: {len(test_results[0].page_content)}"
-                )
-            else:
-                debug_info.append("- No results found")
-        except Exception as e:
-            debug_info.append(f"- Test search failed: {str(e)}")
-
-        return "\n".join(debug_info)
-
-    except Exception as e:
-        return f"## ❌ Debug Error\n\nError during debug: {str(e)}"
-
-
-TOOLS = [
-    kb_tool,
-    initialize_vectorstore_with_cv,
-    crawl_website,
-    get_cv_stats,
-    debug_vectorstore,
-]
+TOOLS = [kb_tool, initialize_vectorstore_with_cv, crawl_website]
