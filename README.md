@@ -1,67 +1,81 @@
 # 🧾 Draft 'n' Pray - AI Mail Writer
 
-> Write. Send. Hope. Repeat. (Now with AI)
+> **Write. Send. Hope. Repeat.** *(Now with AI)*
 
-A powerful AI-powered email writing assistant that helps you craft personalized emails using your CV and web research. Available in two flavors: **CLI Tool** and **Streamlit Web UI**.
+A powerful AI-powered email writing assistant that helps you craft personalized emails using your CV and web research. Available as both a **CLI tool** and **Streamlit web interface**.
 
 ![Streamlit UI Banner](images/streamlit_banner.png)
 
-## 🚀 Features
+## ✨ Features
 
-- **AI-Powered Email Generation** - Uses advanced LLMs to craft personalized emails
-- **CV Integration** - Upload your CV for personalized content based on your experience
-- **Web Research** - Crawl websites to gather information about companies, labs, or opportunities
-- **Smart Tool Usage** - Automatically selects the right tools for your request
-- **Streaming Responses** - Real-time token streaming for better user experience
-- **Clean Interface** - Minimal, ChatGPT-like UI that focuses on content
+- 🤖 **AI-Powered Email Generation** - Advanced LLMs craft personalized emails
+- 📄 **CV Integration** - Upload your CV for experience-based personalization
+- 🌐 **Web Research** - Crawl websites to gather company/lab information
+- 🧠 **Smart Tool Selection** - Automatically chooses the right tools for your request
+- ⚡ **Real-time Streaming** - Live token streaming for better user experience
+- 🎨 **Clean Interface** - Minimal, ChatGPT-like UI focused on content
+- 🔑 **Smart API Management** - Interactive setup and secure storage of API keys
 
-## 🛠️ Two Ways to Use
+## 🚀 Quick Start
 
-### Option 1: CLI Tool (Command Line)
+### Prerequisites
+- Python 3.8+
+- Google API key for Gemini AI
+- Firecrawl API key for web crawling
 
-Perfect for developers and power users who prefer command-line interfaces.
-
+### Installation
 ```bash
+# Clone the repository
+git clone <your-repo-url>
+cd mail_writer_agent
+
 # Install dependencies
 pip install -r requirements.txt
+```
 
+## 🛠️ Usage Options
+
+### Option 1: CLI Tool (Recommended for Developers)
+
+**Interactive Setup:**
+```bash
+# Setup API keys interactively
+python agent.py setup-keys
+
+# Run the application
+python agent.py
+```
+
+**Manual Setup:**
+```bash
 # Set environment variables
 export GOOGLE_API_KEY="your_google_api_key"
 export FIRECRAWL_API_KEY="your_firecrawl_api_key"
 
-# Run the CLI tool
-python run.py
+# Run the application
+python agent.py
 ```
 
-**CLI Features:**
-- Fast command-line interface
-- Easy integration with scripts and automation
-- Lightweight and efficient
-- Perfect for batch processing
+**Available CLI Commands:**
+- `python agent.py` - Start the main application
+- `python agent.py setup-keys` - Interactive API key setup
+- `python agent.py check-keys` - Check current API key status
+- `python agent.py --help` - Show all available commands
 
 ### Option 2: Streamlit Web UI
 
-Beautiful web interface that anyone can use, perfect for deployment and sharing.
+Perfect for non-technical users and deployment scenarios.
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
 # Run the Streamlit app
 streamlit run streamlit_app.py
 ```
 
-**Web UI Features:**
-- Beautiful dark theme with coding fonts
-- Interactive sidebar for configuration
-- Real-time streaming responses
-- Tool call visibility toggle
-- CV upload and management
-- Deployable to Streamlit Cloud
+Then open your browser and enter your API keys in the sidebar.
 
-## 🔑 Setup
+## 🔑 API Key Setup
 
-### Required API Keys
+### Required Keys
 
 1. **Google API Key** - For Gemini LLM access
    - Get it from [Google AI Studio](https://makersuite.google.com/app/apikey)
@@ -69,73 +83,88 @@ streamlit run streamlit_app.py
 2. **Firecrawl API Key** - For web crawling capabilities
    - Get it from [Firecrawl](https://firecrawl.dev/)
 
-### Environment Variables
+### Setup Methods
 
-**For CLI Tool:**
+**Method 1: Interactive Setup (Recommended)**
+```bash
+python agent.py setup-keys
+```
+This will:
+- Prompt for missing API keys
+- Store them securely in memory
+- Offer to save to `.env` file
+- Validate all keys before proceeding
+
+**Method 2: Environment Variables**
 ```bash
 export GOOGLE_API_KEY="your_key_here"
 export FIRECRAWL_API_KEY="your_key_here"
 ```
 
-**For Streamlit UI:**
-- Enter your API keys directly in the sidebar
-- No environment variables needed!
+**Method 3: .env File**
+Create a `.env` file in your project directory:
+```env
+GOOGLE_API_KEY=your_google_api_key_here
+FIRECRAWL_API_KEY=your_firecrawl_api_key_here
+CV_PATH=cv.pdf  # Optional
+```
 
 ## 📁 Project Structure
 
 ```
 mail_writer_agent/
-├── run.py                 # CLI tool entry point
-├── streamlit_app.py       # Streamlit web UI
-├── agent.py              # Core agent logic
+├── agent.py              # Enhanced CLI tool with API key management
+├── streamlit_app.py      # Streamlit web interface
 ├── tools.py              # Tool definitions (CV search, web crawling)
 ├── model.py              # LLM model configuration
 ├── system_prompt.py      # Agent system prompt
 ├── ui_theme.py           # Streamlit UI theme
 ├── requirements.txt      # Python dependencies
+├── .env                  # Environment variables (auto-created)
 └── images/               # Banner images and assets
     └── streamlit_banner.png
 ```
 
-## 🚀 Quick Start
-
-### CLI Tool
-```bash
-# 1. Clone the repository
-git clone <your-repo-url>
-cd mail_writer_agent
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Set API keys
-export GOOGLE_API_KEY="your_key"
-export FIRECRAWL_API_KEY="your_key"
-
-# 4. Run
-python run.py
-```
-
-### Streamlit UI
-```bash
-# 1. Clone the repository
-git clone <your-repo-url>
-cd mail_writer_agent
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Run Streamlit
-streamlit run streamlit_app.py
-
-# 4. Open browser and enter your API keys in the sidebar
-```
-
 ## 💡 Example Prompts
 
-- **Email Generation**: "Crawl https://prof-site.edu and write an email to the professor about joining their lab"
-- **CV Analysis**: "What are my programming languages?" or "Summarize my work experience"
-- **Research**: "Find the latest publications from this research group"
+### Email Generation
+- "Crawl https://prof-site.edu and write an email to the professor about joining their lab"
+- "Research this company and draft a cover letter for the software engineer position"
+
+### CV Analysis
+- "What are my programming languages?"
+- "Summarize my work experience"
+- "What technical skills do I have?"
+
+### Research Tasks
+- "Find the latest publications from this research group"
+- "What are the main research areas of this lab?"
+
+## 🔧 CLI Commands Reference
+
+### Main Application
+```bash
+python agent.py                    # Start the main application
+```
+
+### API Key Management
+```bash
+python agent.py setup-keys         # Interactive API key setup
+python agent.py check-keys         # Check current API key status
+```
+
+### Help and Information
+```bash
+python agent.py --help             # Show CLI help
+python agent.py version            # Show version information
+```
+
+### In-App Commands (during chat)
+- `help` - Show available commands
+- `tools` - Show available tools
+- `cv` - Show CV status
+- `apikeys` - Show API key status
+- `quit`, `exit`, `bye` - Exit the application
 
 ## 🌐 Deployment
 
@@ -143,12 +172,36 @@ streamlit run streamlit_app.py
 1. Push your code to GitHub
 2. Connect your repo to [Streamlit Cloud](https://streamlit.io/cloud)
 3. Deploy automatically
-4. Users can input their own API keys in the web interface
+4. Users input their own API keys in the web interface
 
 ### Other Platforms
 - **Heroku**: Use the Streamlit buildpack
 - **Railway**: Deploy with Railway's Python support
 - **Vercel**: Use Vercel's Python runtime
+
+## 🔒 Security Notes
+
+- API keys are stored securely in memory during the session
+- The `.env` file is automatically created but should be kept secure
+- **Never commit your `.env` file to version control**
+- Use environment variables in production deployments
+
+## 🎯 Use Cases
+
+### Academic Applications
+- Research lab applications
+- Conference paper submissions
+- Collaboration requests
+- Grant applications
+
+### Job Applications
+- Cover letters
+- Networking emails
+- Follow-up messages
+- Thank you notes
+
+### Business Communication
+- may be (wont recommend lol)
 
 ## 🔧 Customization
 
@@ -157,99 +210,36 @@ streamlit run streamlit_app.py
 - **UI Theme**: Customize the interface in `ui_theme.py`
 - **Model**: Change LLM provider in `model.py`
 
-## 🚨 Troubleshooting
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-#### 1. **Sidebar Not Visible in Deployment**
-If you can't see the sidebar after deploying:
+**API Key Errors:**
+- Ensure both `GOOGLE_API_KEY` and `FIRECRAWL_API_KEY` are set
+- Use `python agent.py check-keys` to verify status
+- Run `python agent.py setup-keys` for interactive setup
 
-**Immediate Solutions:**
-- **Look for hamburger menu (☰)** in the top-left corner
-- **Hover over the left edge** of the screen
-- **Use the fallback API key inputs** in the main area
-- **Press `Ctrl + Shift + S`** to toggle sidebar
-- **Refresh the page** (F5 or Ctrl+R)
+**CV Loading Issues:**
+- Check if CV file exists at the specified path
+- Ensure CV is in PDF format
+- Verify Google API key is valid for embeddings
 
-**Deployment-Specific:**
-```bash
-# Use deployment requirements
-pip install -r requirements-deploy.txt
+**Web Crawling Issues:**
+- Verify Firecrawl API key is valid
+- Check if the target website is accessible
+- Ensure URL format is correct
 
-# Check Streamlit config
-cat .streamlit/config.toml
-```
+## 📚 Contributing
 
-#### 2. **Embedding Engine Errors**
-If you see errors like `module 'google.genai' has no attribute 'configure'`:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-```bash
-# Test your setup
-python test_imports.py
+## 📄 License
 
-# Update dependencies
-pip install --upgrade google-genai langchain-google-genai
-
-# Check API key format
-# Google API keys should start with "AI" and be ~40 characters long
-```
-
-#### 3. **CV Loading Fails**
-- Ensure your Google API key is valid and has sufficient quota
-- Check that the PDF file is not corrupted
-- Verify your internet connection
-- Try the "Test Embedding Engine" button in the Streamlit UI
-
-#### 4. **API Key Issues**
-- **Google API Key**: Must be from [Google AI Studio](https://aistudio.google.com/)
-- **Firecrawl API Key**: Optional, only needed for web crawling
-- Keys are stored locally in your browser session
-- Clear and re-enter keys if you encounter issues
-
-#### 5. **Dependency Issues**
-```bash
-# Clean install
-pip uninstall -r requirements.txt
-pip install -r requirements.txt
-
-# Check Python version (3.8+ required)
-python --version
-```
-
-### Deployment Issues
-
-#### **Streamlit Cloud / Heroku / Railway**
-```bash
-# Use deployment requirements
-pip install -r requirements-deploy.txt
-
-# Ensure proper config
-mkdir -p .streamlit
-# Copy the config.toml file
-```
-
-#### **Sidebar Visibility Problems**
-- **Mobile/Tablet**: Swipe from left edge
-- **Desktop**: Look for toggle buttons or hamburger menu
-- **Fallback**: Use the API key inputs in the main area
-- **Browser**: Try Chrome, Firefox, or Safari
-
-### Testing Your Setup
-
-Run the test script to verify everything works:
-```bash
-python test_imports.py
-```
-
-This will check:
-- ✅ All required imports
-- ✅ Google GenAI connectivity
-- ✅ LangChain integration
-- ✅ Embedding engine creation
-
-## 📝 License
-
-[Your License Here]
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 👨‍💻 Creator
 
@@ -258,4 +248,4 @@ This will check:
 
 ---
 
-*Built with ❤️ using LangGraph, Streamlit, and modern AI technologies*
+*Your supervisor won't answer, but at least your grammar's perfect.* 🎯

@@ -22,6 +22,11 @@ from rich.align import Align
 from rich.markdown import Markdown
 import typer
 import uuid
+import getpass
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize colorama for cross-platform color support
 colorama.init(autoreset=True)
@@ -46,6 +51,7 @@ class AgentCLI:
         self.agent = None
         self.cv_loaded = False
         self.cv_path = None
+        self.api_keys = {}
 
     def print_banner(self):
         banner_text = """
@@ -56,7 +62,7 @@ class AgentCLI:
     |██║  ██║██████╔╝███████║█████╗     ██║       ██╔██╗ ██║    ██████╔╝██████╔╝███████║ ╚████╔╝ |
     |██║  ██║██╔══██╗██╔══██║██╔══╝     ██║       ██║╚██╗██║    ██╔═══╝ ██╔══██╗██╔══██║  ╚██╔╝  |
     |██████╔╝██║  ██║██║  ██║██║        ██║       ██║ ╚████║    ██║     ██║  ██║██║  ██║   ██║   |
-    |╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝       ╚═╝  ╚═══╝    ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   |
+    |╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝       ╚═╝  ╚═══╝   ═╝    ═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   |
     +============================================================================================+
 
         """
@@ -81,36 +87,176 @@ class AgentCLI:
         console.print(header)
         console.print()
 
-    def check_environment(self):
+    def get_api_key_interactively(self, key_name: str, description: str = "") -> str:
+        """Securely get API key from user input"""
+        console.print(f"\n🔑 [bold yellow]API Key Required: {key_name}[/bold yellow]")
+        if description:
+            console.print(f"💡 {description}")
+
+        # Try to get from environment first
+        env_value = os.getenv(key_name)
+        if env_value:
+            console.print(f"✅ Found {key_name} in environment", style="green")
+            if Confirm.ask(f"🔄 Would you like to update the existing {key_name}?"):
+                # User wants to update, continue to input
+                pass
+            else:
+                return env_value
+
+        # Ask user to input the key
+        while True:
+            try:
+                # Use getpass for secure input (hidden on most terminals)
+                api_key = getpass.getpass(f"🔐 Enter your {key_name}: ")
+                if api_key.strip():
+                    # Store in memory for this session
+                    self.api_keys[key_name] = api_key.strip()
+                    # Set as environment variable for this session
+                    os.environ[key_name] = api_key.strip()
+                    console.print(f"✅ {key_name} set successfully", style="green")
+                    return api_key.strip()
+                else:
+                    console.print("❌ API key cannot be empty", style="red")
+            except Exception as e:
+                console.print(f"❌ Error reading API key: {str(e)}", style="yellow")
+                # Fallback to regular input if getpass fails
+                api_key = Prompt.ask(f"🔐 Enter your {key_name}")
+                if api_key.strip():
+                    self.api_keys[key_name] = api_key.strip()
+                    os.environ[key_name] = api_key.strip()
+                    console.print(f"✅ {key_name} set successfully", style="green")
+                    return api_key.strip()
+
+    def check_and_setup_environment(self):
+        """Check environment and setup missing API keys interactively"""
         console.print("🔍 Checking environment configuration...", style="yellow")
 
-        required_vars = ["GOOGLE_API_KEY", "FIRECRAWL_API_KEY"]
-        missing_vars = []
+        # Define required API keys with descriptions
+        required_keys = {
+            "GOOGLE_API_KEY": "Required for Google AI services (Gemini, etc.)",
+            "FIRECRAWL_API_KEY": "Required for web crawling functionality",
+        }
 
-        for var in required_vars:
-            if not os.getenv(var):
-                missing_vars.append(var)
+        missing_keys = []
 
-        if missing_vars:
+        # Check which keys are missing
+        for key_name, description in required_keys.items():
+            if not os.getenv(key_name):
+                missing_keys.append((key_name, description))
+
+        if missing_keys:
             console.print(
-                f"❌ Missing required environment variables: {', '.join(missing_vars)}",
-                style="red",
+                f"\n⚠️  [yellow]Missing {len(missing_keys)} required API key(s):[/yellow]"
             )
-            console.print(
-                "💡 Please create a .env file with the required API keys", style="cyan"
-            )
-            return False
 
-        console.print("✅ Environment configuration valid", style="green")
+            # Ask user if they want to input keys interactively
+            if Confirm.ask("\n🔑 Would you like to input the missing API keys now?"):
+                console.print("\n[bold cyan]Setting up API keys...[/bold cyan]")
+
+                for key_name, description in missing_keys:
+                    self.get_api_key_interactively(key_name, description)
+
+                console.print("\n✅ All required API keys have been set", style="green")
+            else:
+                console.print(
+                    "\n❌ [red]API keys are required to run the application[/red]"
+                )
+                console.print("💡 You can:")
+                console.print("   • Create a .env file with your API keys")
+                console.print("   • Set them as environment variables")
+                console.print(
+                    "   • Run the application again and input them interactively"
+                )
+                return False
+        else:
+            console.print(
+                "✅ All required API keys found in environment", style="green"
+            )
+
+        # Verify all keys are now available
+        for key_name in required_keys.keys():
+            if not os.getenv(key_name):
+                console.print(f"❌ [red]Failed to set {key_name}[/red]")
+                return False
+
+        console.print("✅ Environment configuration complete", style="green")
         return True
+
+    def save_api_keys_to_env_file(self):
+        """Offer to save API keys to .env file for future use"""
+        if not self.api_keys:
+            return
+
+        if Confirm.ask(
+            "\n💾 Would you like to save these API keys to a .env file for future use?"
+        ):
+            try:
+                env_content = []
+
+                # Read existing .env file if it exists
+                if Path(".env").exists():
+                    with open(".env", "r") as f:
+                        existing_lines = f.readlines()
+                        existing_keys = set()
+
+                        for line in existing_lines:
+                            if "=" in line and not line.strip().startswith("#"):
+                                key = line.split("=")[0].strip()
+                                existing_keys.add(key)
+
+                        # Add existing keys that weren't updated
+                        for line in existing_lines:
+                            if "=" in line and not line.strip().startswith("#"):
+                                key = line.split("=")[0].strip()
+                                if key not in self.api_keys:
+                                    env_content.append(line)
+
+                # Add new/updated API keys
+                for key_name, key_value in self.api_keys.items():
+                    env_content.append(f"{key_name}={key_value}\n")
+
+                # Write to .env file
+                with open(".env", "w") as f:
+                    f.writelines(env_content)
+
+                console.print("✅ API keys saved to .env file", style="green")
+                console.print(
+                    "💡 [yellow]Note: Keep your .env file secure and don't commit it to version control[/yellow]"
+                )
+
+            except Exception as e:
+                console.print(
+                    f"⚠️  Failed to save to .env file: {str(e)}", style="yellow"
+                )
+
+    def check_environment(self):
+        """Legacy method - now calls the new setup method"""
+        return self.check_and_setup_environment()
 
     def initialize_agent(self):
         try:
             with console.status("[bold green]Initializing AI Agent...", spinner="dots"):
-                llm = get_model()
+                # Get the required API keys
+                google_api_key = os.getenv("GOOGLE_API_KEY")
+                firecrawl_api_key = os.getenv("FIRECRAWL_API_KEY")
+
+                if not google_api_key:
+                    console.print("❌ GOOGLE_API_KEY not found", style="red")
+                    return False
+
+                if not firecrawl_api_key:
+                    console.print("❌ FIRECRAWL_API_KEY not found", style="red")
+                    return False
+
+                # Create tools with proper API keys
+                from tools import create_tools_with_api_keys
+
+                tools = create_tools_with_api_keys(google_api_key, firecrawl_api_key)
+
+                llm = get_model(api_key=google_api_key)
                 self.agent = create_react_agent(
                     model=llm,
-                    tools=TOOLS,
+                    tools=tools,
                     prompt=system_prompt,
                     checkpointer=checkpointer,
                 )
@@ -141,7 +287,15 @@ class AgentCLI:
             task = progress.add_task("Processing CV...", total=None)
 
             try:
-                if initialize_vectorstore_with_cv(self.cv_path):
+                # Get the Google API key for embeddings
+                google_api_key = os.getenv("GOOGLE_API_KEY")
+                if not google_api_key:
+                    console.print(
+                        "❌ GOOGLE_API_KEY not found for CV processing", style="red"
+                    )
+                    return False
+
+                if initialize_vectorstore_with_cv(self.cv_path, api_key=google_api_key):
                     progress.update(task, description="✅ CV loaded successfully!")
                     self.cv_loaded = True
                     return True
@@ -188,13 +342,24 @@ class AgentCLI:
 • [green]help[/green] - Show this help message
 • [green]tools[/green] - Show available tools
 • [green]cv[/green] - Show CV status
+• [green]apikeys[/green] - Show API key status
 • [green]quit[/green], [green]exit[/green], [green]bye[/green] - Exit the application
+
+[bold cyan]CLI Commands:[/bold cyan]
+• [green]python agent.py[/green] - Start the main application
+• [green]python agent.py setup-keys[/green] - Setup API keys interactively
+• [green]python agent.py --help[/green] - Show CLI help
 
 [bold cyan]Example Queries:[/bold cyan]
 • "What are my technical skills?"
 • "Tell me about my work experience"
 • "Crawl https://example.com and summarize it"
 • "What programming languages do I know?"
+
+[bold cyan]API Key Management:[/bold cyan]
+• Set GOOGLE_API_KEY and FIRECRAWL_API_KEY in .env file
+• Or run [green]python agent.py setup-keys[/green] for interactive setup
+• API keys are stored securely and can be saved for future use
         """
 
         panel = Panel(help_text, title="📚 Help", border_style="cyan")
@@ -213,6 +378,37 @@ class AgentCLI:
 
         panel = Panel(status_info, title="📄 CV Information", border_style="blue")
         console.print(panel)
+
+    def show_api_keys_status(self):
+        """Display API key status information"""
+        required_keys = {
+            "GOOGLE_API_KEY": "Required for Google AI services (Gemini, etc.)",
+            "FIRECRAWL_API_KEY": "Required for web crawling functionality",
+        }
+
+        status_table = Table(
+            title="🔑 API Key Status", show_header=True, header_style="bold magenta"
+        )
+        status_table.add_column("API Key", style="cyan", no_wrap=True)
+        status_table.add_column("Status", style="white")
+        status_table.add_column("Description", style="yellow")
+
+        for key_name, description in required_keys.items():
+            status = "✅ Set" if os.getenv(key_name) else "❌ Missing"
+            status_style = "green" if os.getenv(key_name) else "red"
+            status_table.add_row(
+                key_name, f"[{status_style}]{status}[/{status_style}]", description
+            )
+
+        console.print(status_table)
+
+        # Show additional info
+        if self.api_keys:
+            console.print(
+                f"\n💡 [cyan]Session API keys: {len(self.api_keys)} key(s) loaded[/cyan]"
+            )
+        else:
+            console.print("\n💡 [cyan]No session API keys loaded[/cyan]")
 
     def render_markdown_response(self, markdown_text: str):
         """Render markdown response with proper formatting"""
@@ -267,6 +463,9 @@ class AgentCLI:
                     continue
                 elif message.lower() == "cv":
                     self.show_cv_status()
+                    continue
+                elif message.lower() == "apikeys":
+                    self.show_api_keys_status()
                     continue
                 elif not message.strip():
                     continue
@@ -335,6 +534,9 @@ class AgentCLI:
         except Exception as e:
             console.print(f"\n❌ [bold red]Fatal error: {str(e)}[/bold red]")
             sys.exit(1)
+        finally:
+            # Offer to save API keys to .env file
+            self.save_api_keys_to_env_file()
 
 
 @app.command()
@@ -342,6 +544,34 @@ def main():
     """Start the Draft 'n' Pray Agent"""
     agent_cli = AgentCLI()
     agent_cli.run()
+
+
+@app.command()
+def setup_keys():
+    """Setup API keys interactively"""
+    agent_cli = AgentCLI()
+    console.print("[bold cyan]🔑 API Key Setup[/bold cyan]")
+    console.print("This will help you configure your API keys for the application.\n")
+
+    if agent_cli.check_and_setup_environment():
+        agent_cli.save_api_keys_to_env_file()
+        console.print(
+            "\n✅ [bold green]API key setup completed successfully![/bold green]"
+        )
+        console.print(
+            "💡 You can now run the main application with: [cyan]python agent.py[/cyan]"
+        )
+    else:
+        console.print("\n❌ [bold red]API key setup failed.[/bold red]")
+        sys.exit(1)
+
+
+@app.command()
+def check_keys():
+    """Check current API key status"""
+    agent_cli = AgentCLI()
+    console.print("[bold cyan]🔍 API Key Status Check[/bold cyan]\n")
+    agent_cli.show_api_keys_status()
 
 
 @app.command()

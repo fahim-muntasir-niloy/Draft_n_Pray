@@ -238,4 +238,5 @@ def crawl_website(url: str, api_key: str):
         return f"## ❌ Error\n\nError crawling website: {str(e)}"
 
 
+# Default tools list (will be overridden by create_tools_with_api_keys in agent.py)
 TOOLS = [kb_tool, initialize_vectorstore_with_cv, crawl_website]

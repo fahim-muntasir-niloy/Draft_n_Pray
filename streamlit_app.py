@@ -21,31 +21,10 @@ st.set_page_config(
     page_icon="🧾",
     layout="wide",
     initial_sidebar_state="expanded",
-    menu_items={
-        "Get Help": "https://github.com/your-repo/issues",
-        "Report a bug": "https://github.com/your-repo/issues",
-        "About": "# Draft 'n' Pray\n\nAI-powered email writing assistant",
-    },
 )
 
-# Force sidebar to be visible
-st.markdown(
-    """
-<style>
-    [data-testid="collapsedControl"] {
-        display: none !important;
-    }
-    .main .block-container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    .sidebar .sidebar-content {
-        width: 100% !important;
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
+# Apply the dark mode CSS
+st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
 
 
 # Initialize session state FIRST (before using any session state variables)
@@ -63,19 +42,6 @@ if "google_api_key" not in st.session_state:
     st.session_state.google_api_key = ""
 if "firecrawl_api_key" not in st.session_state:
     st.session_state.firecrawl_api_key = ""
-
-# Apply the dark mode CSS
-st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
-
-
-def is_deployed():
-    """Check if the app is running in a deployment environment"""
-    return (
-        os.getenv("STREAMLIT_SERVER_HEADLESS", "false").lower() == "true"
-        or os.getenv("STREAMLIT_SERVER_ENABLE_STATIC_SERVING", "false").lower()
-        == "true"
-        or os.getenv("STREAMLIT_SERVER_ENABLE_CORS", "false").lower() == "true"
-    )
 
 
 def needs_reinitialization():
@@ -294,14 +260,7 @@ def main():
         st.error(f"❌ **{message}**")
 
         # Show deployment-specific help
-        if is_deployed():
-            st.warning("🌐 **Deployment Mode Detected**")
-            st.markdown("""
-            **If you can't see the sidebar:**
-            1. **Look for the hamburger menu (☰)** in the top-left corner
-            2. **Use the API key inputs** in the main area below
-            3. **Try refreshing the page** if the sidebar is stuck
-            """)
+        # Removed deployment detection and specific help messages
 
         st.info("Please enter your Google API key to get started.")
 
@@ -315,16 +274,17 @@ def main():
                - Sign in and create a new API key
                - Copy the key (it starts with 'AI...')
             
-            2. **Enter the key:**
-               - **Option A**: Use the sidebar on the left (if visible)
-               - **Option B**: Use the inputs in the main area below
+            2. **Enter the key in the sidebar:**
+               - Look for the "Google API Key" field on the left
+               - Paste your key there
+               - The app will automatically validate it
             
             3. **Initialize the AI Agent:**
-               - Click the 'Initialize Agent' button
+               - Click the "Initialize Agent" button
                - Wait for confirmation
                - Start writing emails!
             
-            **Need help?** Check the troubleshooting section below.
+            **Need help?** Check the "Where to get API keys?" section in the sidebar.
             """)
 
         st.stop()
@@ -340,16 +300,6 @@ def main():
         '<p class="subtitle">// Write. Send. Hope. Repeat. (Now with AI) //</p>',
         unsafe_allow_html=True,
     )
-
-    # Sidebar toggle help for deployment
-    if st.button("🔧 **Show/Hide Sidebar**", help="Click to toggle sidebar visibility"):
-        st.info("💡 **Sidebar Help:**")
-        st.markdown("""
-        - **If sidebar is hidden**: Look for the hamburger menu (☰) in the top-left corner
-        - **On mobile**: Swipe from left edge to reveal sidebar
-        - **On desktop**: Hover over the left edge or click the arrow button
-        - **Still can't see it?**: Use the API key inputs in the main area above
-        """)
 
     # Sidebar for configuration
     with st.sidebar:
@@ -591,101 +541,14 @@ def main():
     # Main chat area - minimal and clean like ChatGPT
     if not st.session_state.agent:
         st.info("🚀 **Welcome to Draft 'n' Pray!**")
-
-        # Fallback API key input for deployment issues
-        st.markdown("### 🔑 **Enter Your API Keys**")
-        st.warning("⚠️ **If you can't see the sidebar, enter your API keys here:**")
-
-        col1, col2 = st.columns(2)
-        with col1:
-            fallback_google_key = st.text_input(
-                "Google API Key (Required)",
-                type="password",
-                help="Enter your Google API key for Gemini access",
-                placeholder="AI...",
-                key="fallback_google_key",
-            )
-        with col2:
-            fallback_firecrawl_key = st.text_input(
-                "Firecrawl API Key (Optional)",
-                type="password",
-                help="Enter your Firecrawl API key for web crawling",
-                placeholder="fc...",
-                key="fallback_firecrawl_key",
-            )
-
-        # Update session state if fallback keys are provided
-        if fallback_google_key and fallback_google_key != st.session_state.get(
-            "google_api_key", ""
-        ):
-            st.session_state.google_api_key = fallback_google_key
-            os.environ["GOOGLE_API_KEY"] = fallback_google_key
-            st.success("✅ Google API key updated!")
-
-        if fallback_firecrawl_key and fallback_firecrawl_key != st.session_state.get(
-            "firecrawl_api_key", ""
-        ):
-            st.session_state.firecrawl_api_key = fallback_firecrawl_key
-            os.environ["FIRECRAWL_API_KEY"] = fallback_firecrawl_key
-            st.success("✅ Firecrawl API key updated!")
-
         st.markdown("""
         To get started:
-        1. **Enter your Google API key** above (required)
+        1. **Enter your Google API key** in the sidebar (required)
         2. **Enter your Firecrawl API key** if you want web crawling features (optional)
-        3. **Click 'Initialize Agent'** below to start the AI assistant
+        3. **Click 'Initialize Agent'** to start the AI assistant
         4. **Upload your CV** for personalized email writing
         """)
-
-        # Initialize button in main area
-        if fallback_google_key:
-            if st.button(
-                "🤖 **Initialize AI Agent**", type="primary", use_container_width=True
-            ):
-                with st.spinner("Initializing AI Agent..."):
-                    if initialize_agent():
-                        st.success("✅ Agent initialized successfully!")
-                        st.rerun()
-                    else:
-                        st.error("❌ Failed to initialize agent")
-        else:
-            st.button(
-                "🤖 **Initialize AI Agent**",
-                disabled=True,
-                use_container_width=True,
-                help="Enter your Google API key first",
-            )
-
-        st.warning("⚠️ Please initialize the AI Agent to get started!")
-
-        # Troubleshooting section for deployment
-        with st.expander(
-            "🚨 **Troubleshooting - Sidebar Not Visible?**", expanded=True
-        ):
-            st.markdown("""
-            ### **Can't See the Sidebar?**
-            
-            **Try these solutions:**
-            1. **Look for the hamburger menu (☰)** in the top-left corner
-            2. **Hover over the left edge** of the screen
-            3. **Click the arrow button** if visible
-            4. **Refresh the page** (F5 or Ctrl+R)
-            5. **Use the API key inputs above** as a fallback
-            
-            **Mobile/Tablet Users:**
-            - Swipe from the left edge of the screen
-            - Look for a menu button in the top-left
-            
-            **Desktop Users:**
-            - Press `Ctrl + Shift + S` to toggle sidebar
-            - Look for the sidebar toggle button
-            
-            **Still Having Issues?**
-            - Try a different browser (Chrome, Firefox, Safari)
-            - Clear browser cache and cookies
-            - Check if JavaScript is enabled
-            """)
-
+        st.warning("⚠️ Please initialize the AI Agent in the sidebar to get started!")
         return
 
     # Check if CV is loaded (only show warning if agent is ready)
