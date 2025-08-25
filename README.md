@@ -1,104 +1,171 @@
-# Draft 'n' Pray
+# 🧾 Draft 'n' Pray - AI Mail Writer
 
-![Draft 'n' Pray Banner](images/banner.png)
+> Write. Send. Hope. Repeat. (Now with AI)
 
-> **Write. Send. Hope. Repeat. (Now with AI)**
+A powerful AI-powered email writing assistant that helps you craft personalized emails using your CV and web research. Available in two flavors: **CLI Tool** and **Streamlit Web UI**.
 
-A powerful AI-powered CLI application that helps you draft professional emails and cover letters using your CV/resume as context. Built with LangChain, LangGraph, and Google's Generative AI.
+![Streamlit UI Banner](images/streamlit_banner.png)
 
-## ✨ Features
+## 🚀 Features
 
-- 🤖 **AI-Powered Writing**: Generate professional emails and cover letters using Google's Generative AI
-- 📄 **CV Context**: Upload your CV/resume to provide relevant context for personalized content
-- 🌐 **Web Research**: Integrate real-time web research using Firecrawl API
-- 🎨 **Beautiful CLI**: Rich, colorful terminal interface with progress bars and panels
-- 📚 **Knowledge Base**: Intelligent search through your CV content using vector embeddings
-- 🔄 **Interactive Workflow**: Step-by-step guided process for creating professional communications
+- **AI-Powered Email Generation** - Uses advanced LLMs to craft personalized emails
+- **CV Integration** - Upload your CV for personalized content based on your experience
+- **Web Research** - Crawl websites to gather information about companies, labs, or opportunities
+- **Smart Tool Usage** - Automatically selects the right tools for your request
+- **Streaming Responses** - Real-time token streaming for better user experience
+- **Clean Interface** - Minimal, ChatGPT-like UI that focuses on content
 
-## 🚀 Installation
+## 🛠️ Two Ways to Use
 
-### Prerequisites
+### Option 1: CLI Tool (Command Line)
 
-- Python 3.12 or higher
-- Google API Key for Generative AI
-- Firecrawl API Key for web research
-
-### Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone <Draft_n_Pray>
-   cd Draft_n_pray
-   ```
-
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Set up environment variables**
-   
-   Create a `.env` file in the project root:
-   ```env
-   GOOGLE_API_KEY=your_google_api_key_here
-   FIRECRAWL_API_KEY=your_firecrawl_api_key_here
-   CV_PATH="PATH\TO\YOUR\CV.PDF"
-   ```
-
-4. **Get API Keys**
-   - **Google API Key**: Visit [Google AI Studio](https://makersuite.google.com/app/apikey) to get your API key [basic usage is free!]
-   - **Firecrawl API Key**: Visit [Firecrawl](https://firecrawl.dev/) to get your API key [you get free credits!]
-
-## 🎯 Usage
+Perfect for developers and power users who prefer command-line interfaces.
 
 ```bash
-$ python run.py
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+export GOOGLE_API_KEY="your_google_api_key"
+export FIRECRAWL_API_KEY="your_firecrawl_api_key"
+
+# Run the CLI tool
+python run.py
 ```
 
+**CLI Features:**
+- Fast command-line interface
+- Easy integration with scripts and automation
+- Lightweight and efficient
+- Perfect for batch processing
 
-## 🔧 Configuration
+### Option 2: Streamlit Web UI
+
+Beautiful web interface that anyone can use, perfect for deployment and sharing.
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the Streamlit app
+streamlit run streamlit_app.py
+```
+
+**Web UI Features:**
+- Beautiful dark theme with coding fonts
+- Interactive sidebar for configuration
+- Real-time streaming responses
+- Tool call visibility toggle
+- CV upload and management
+- Deployable to Streamlit Cloud
+
+## 🔑 Setup
+
+### Required API Keys
+
+1. **Google API Key** - For Gemini LLM access
+   - Get it from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   
+2. **Firecrawl API Key** - For web crawling capabilities
+   - Get it from [Firecrawl](https://firecrawl.dev/)
 
 ### Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `GOOGLE_API_KEY` | Google Generative AI API key | Yes |
-| `FIRECRAWL_API_KEY` | Firecrawl API key for web research | Yes |
+**For CLI Tool:**
+```bash
+export GOOGLE_API_KEY="your_key_here"
+export FIRECRAWL_API_KEY="your_key_here"
+```
 
-### Supported File Formats
+**For Streamlit UI:**
+- Enter your API keys directly in the sidebar
+- No environment variables needed!
 
-- **CV/Resume**: PDF files
-- **Output**: Markdown format (easily convertible to other formats)
+## 📁 Project Structure
 
+```
+mail_writer_agent/
+├── run.py                 # CLI tool entry point
+├── streamlit_app.py       # Streamlit web UI
+├── agent.py              # Core agent logic
+├── tools.py              # Tool definitions (CV search, web crawling)
+├── model.py              # LLM model configuration
+├── system_prompt.py      # Agent system prompt
+├── ui_theme.py           # Streamlit UI theme
+├── requirements.txt      # Python dependencies
+└── images/               # Banner images and assets
+    └── streamlit_banner.png
+```
 
+## 🚀 Quick Start
 
-## 🤝 Contributing
+### CLI Tool
+```bash
+# 1. Clone the repository
+git clone <your-repo-url>
+cd mail_writer_agent
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+# 2. Install dependencies
+pip install -r requirements.txt
 
-## 📄 License
+# 3. Set API keys
+export GOOGLE_API_KEY="your_key"
+export FIRECRAWL_API_KEY="your_key"
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# 4. Run
+python run.py
+```
 
-## 👨‍💻 Author
+### Streamlit UI
+```bash
+# 1. Clone the repository
+git clone <your-repo-url>
+cd mail_writer_agent
 
-**Fahim Muntasir**
-- Email: muntasirfahim.niloy@gmail.com
-- GitHub: [@fahim-muntasir-niloy](https://github.com/fahim-muntasir-niloy)
+# 2. Install dependencies
+pip install -r requirements.txt
 
-## 🙏 Acknowledgments
+# 3. Run Streamlit
+streamlit run streamlit_app.py
 
-- Built with [LangChain](https://langchain.com/)
-- Powered by [Google Generative AI](https://ai.google.dev/)
-- Web research powered by [Firecrawl](https://firecrawl.dev/)
-- Beautiful CLI thanks to [Rich](https://rich.readthedocs.io/)
+# 4. Open browser and enter your API keys in the sidebar
+```
+
+## 💡 Example Prompts
+
+- **Email Generation**: "Crawl https://prof-site.edu and write an email to the professor about joining their lab"
+- **CV Analysis**: "What are my programming languages?" or "Summarize my work experience"
+- **Research**: "Find the latest publications from this research group"
+
+## 🌐 Deployment
+
+### Streamlit Cloud
+1. Push your code to GitHub
+2. Connect your repo to [Streamlit Cloud](https://streamlit.io/cloud)
+3. Deploy automatically
+4. Users can input their own API keys in the web interface
+
+### Other Platforms
+- **Heroku**: Use the Streamlit buildpack
+- **Railway**: Deploy with Railway's Python support
+- **Vercel**: Use Vercel's Python runtime
+
+## 🔧 Customization
+
+- **System Prompt**: Modify `system_prompt.py` to change agent behavior
+- **Tools**: Add new tools in `tools.py`
+- **UI Theme**: Customize the interface in `ui_theme.py`
+- **Model**: Change LLM provider in `model.py`
+
+## 📝 License
+
+[Your License Here]
+
+## 👨‍💻 Creator
+
+**Fahim Muntasir**  
+📧 muntasirfahim.niloy@gmail.com
 
 ---
 
-**Draft 'n' Pray** 
-
-Your supervisor won’t answer, but at least your grammar’s perfect. ✨
+*Built with ❤️ using LangGraph, Streamlit, and modern AI technologies*

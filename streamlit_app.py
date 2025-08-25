@@ -18,7 +18,7 @@ from ui_theme import DARK_THEME_CSS
 # Page configuration
 st.set_page_config(
     page_title="Draft 'n' Pray - AI Mail Writer",
-    page_icon="🌙",
+    page_icon="🧾",
     layout="wide",
     initial_sidebar_state="expanded",
 )
