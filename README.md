@@ -19,15 +19,15 @@ A powerful AI-powered email writing assistant that helps you craft personalized 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.12+
 - Google API key for Gemini AI
 - Firecrawl API key for web crawling
 
 ### Installation
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd mail_writer_agent
+git clone 
+cd directory
 
 # Install dependencies
 pip install -r requirements.txt
