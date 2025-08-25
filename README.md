@@ -157,6 +157,59 @@ streamlit run streamlit_app.py
 - **UI Theme**: Customize the interface in `ui_theme.py`
 - **Model**: Change LLM provider in `model.py`
 
+## 🚨 Troubleshooting
+
+### Common Issues
+
+#### 1. **Embedding Engine Errors**
+If you see errors like `module 'google.genai' has no attribute 'configure'`:
+
+```bash
+# Test your setup
+python test_imports.py
+
+# Update dependencies
+pip install --upgrade google-genai langchain-google-genai
+
+# Check API key format
+# Google API keys should start with "AI" and be ~40 characters long
+```
+
+#### 2. **CV Loading Fails**
+- Ensure your Google API key is valid and has sufficient quota
+- Check that the PDF file is not corrupted
+- Verify your internet connection
+- Try the "Test Embedding Engine" button in the Streamlit UI
+
+#### 3. **API Key Issues**
+- **Google API Key**: Must be from [Google AI Studio](https://aistudio.google.com/)
+- **Firecrawl API Key**: Optional, only needed for web crawling
+- Keys are stored locally in your browser session
+- Clear and re-enter keys if you encounter issues
+
+#### 4. **Dependency Issues**
+```bash
+# Clean install
+pip uninstall -r requirements.txt
+pip install -r requirements.txt
+
+# Check Python version (3.8+ required)
+python --version
+```
+
+### Testing Your Setup
+
+Run the test script to verify everything works:
+```bash
+python test_imports.py
+```
+
+This will check:
+- ✅ All required imports
+- ✅ Google GenAI connectivity
+- ✅ LangChain integration
+- ✅ Embedding engine creation
+
 ## 📝 License
 
 [Your License Here]
