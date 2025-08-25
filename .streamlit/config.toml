@@ -1,0 +1,24 @@
+[global]
+
+# Setting to automatically reload when changes are made to the source files
+developmentMode = false
+
+[server]
+# Setting to enable CORS to allow requests from different origins
+enableCORS = false
+
+# Setting to enable XSS protection
+enableXsrfProtection = false
+
+[browser]
+# Setting to gather usage statistics (disable for privacy)
+gatherUsageStats = false
+
+[theme]
+# Dark theme configuration
+base = "dark"
+primaryColor = "#ff6b6b"
+backgroundColor = "#0e1117"
+secondaryBackgroundColor = "#262730"
+textColor = "#fafafa"
+font = "sans serif"
