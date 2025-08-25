@@ -107,22 +107,24 @@ def kb_tool(query: str):
 
     # Search for relevant content in CV
     try:
-        relevant_docs = vectorstore.similarity_search(query, k=20)
+        relevant_docs = vectorstore.similarity_search(query, k=10)
 
         if not relevant_docs:
             return "No relevant content found in your CV for this query."
 
-        # Format the response nicely with markdown
-        formatted_response = []
-        formatted_response.append(f"## 📄 CV Search Results for: '{query}'")
-        formatted_response.append("")
+        # # Format the response nicely with markdown
+        # formatted_response = []
+        # formatted_response.append(f"## 📄 CV Search Results for: '{query}'")
+        # formatted_response.append("")
 
-        for i, doc in enumerate(relevant_docs, 1):
-            formatted_response.append(f"### Result {i}")
-            formatted_response.append(f"{doc.page_content}")
-            formatted_response.append("")
+        # for i, doc in enumerate(relevant_docs, 1):
+        #     formatted_response.append(f"### Result {i}")
+        #     formatted_response.append(f"{doc.page_content}")
+        #     formatted_response.append("")
 
-        return "\n".join(formatted_response)
+        # return "\n".join(formatted_response)
+
+        return relevant_docs
 
     except Exception as e:
         return f"## ❌ Error\n\nError searching CV: {str(e)}"
@@ -151,24 +153,24 @@ def crawl_website(url: str):
 
         if docs:
             # Format the crawled content nicely with markdown
-            formatted_content = []
-            formatted_content.append(f"## 🌐 Website Crawl Results for: {url}")
-            formatted_content.append("")
+            # formatted_content = []
+            # formatted_content.append(f"## 🌐 Website Crawl Results for: {url}")
+            # formatted_content.append("")
 
-            for i, doc in enumerate(docs, 1):
-                formatted_content.append(f"### Page {i}")
-                if hasattr(doc, "page_content"):
-                    content = (
-                        doc.page_content[:500] + "..."
-                        if len(doc.page_content) > 500
-                        else doc.page_content
-                    )
-                    formatted_content.append(f"{content}")
-                else:
-                    formatted_content.append(f"{str(doc)}")
-                formatted_content.append("")
+            # for i, doc in enumerate(docs, 1):
+            #     formatted_content.append(f"### Page {i}")
+            #     if hasattr(doc, "page_content"):
+            #         content = (
+            #             doc.page_content[:500] + "..."
+            #             if len(doc.page_content) > 500
+            #             else doc.page_content
+            #         )
+            #         formatted_content.append(f"{content}")
+            #     else:
+            #         formatted_content.append(f"{str(doc)}")
+            #     formatted_content.append("")
 
-            return "\n".join(formatted_content)
+            return docs
         else:
             return "## 🌐 Website Crawl Results\n\nNo content found on the website."
 

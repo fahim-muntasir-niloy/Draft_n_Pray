@@ -13,3 +13,4 @@ click
 pyfiglet
 markdown
 google-genai
+streamlit
