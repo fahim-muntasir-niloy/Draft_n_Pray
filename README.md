@@ -161,7 +161,26 @@ streamlit run streamlit_app.py
 
 ### Common Issues
 
-#### 1. **Embedding Engine Errors**
+#### 1. **Sidebar Not Visible in Deployment**
+If you can't see the sidebar after deploying:
+
+**Immediate Solutions:**
+- **Look for hamburger menu (☰)** in the top-left corner
+- **Hover over the left edge** of the screen
+- **Use the fallback API key inputs** in the main area
+- **Press `Ctrl + Shift + S`** to toggle sidebar
+- **Refresh the page** (F5 or Ctrl+R)
+
+**Deployment-Specific:**
+```bash
+# Use deployment requirements
+pip install -r requirements-deploy.txt
+
+# Check Streamlit config
+cat .streamlit/config.toml
+```
+
+#### 2. **Embedding Engine Errors**
 If you see errors like `module 'google.genai' has no attribute 'configure'`:
 
 ```bash
@@ -175,19 +194,19 @@ pip install --upgrade google-genai langchain-google-genai
 # Google API keys should start with "AI" and be ~40 characters long
 ```
 
-#### 2. **CV Loading Fails**
+#### 3. **CV Loading Fails**
 - Ensure your Google API key is valid and has sufficient quota
 - Check that the PDF file is not corrupted
 - Verify your internet connection
 - Try the "Test Embedding Engine" button in the Streamlit UI
 
-#### 3. **API Key Issues**
+#### 4. **API Key Issues**
 - **Google API Key**: Must be from [Google AI Studio](https://aistudio.google.com/)
 - **Firecrawl API Key**: Optional, only needed for web crawling
 - Keys are stored locally in your browser session
 - Clear and re-enter keys if you encounter issues
 
-#### 4. **Dependency Issues**
+#### 5. **Dependency Issues**
 ```bash
 # Clean install
 pip uninstall -r requirements.txt
@@ -196,6 +215,24 @@ pip install -r requirements.txt
 # Check Python version (3.8+ required)
 python --version
 ```
+
+### Deployment Issues
+
+#### **Streamlit Cloud / Heroku / Railway**
+```bash
+# Use deployment requirements
+pip install -r requirements-deploy.txt
+
+# Ensure proper config
+mkdir -p .streamlit
+# Copy the config.toml file
+```
+
+#### **Sidebar Visibility Problems**
+- **Mobile/Tablet**: Swipe from left edge
+- **Desktop**: Look for toggle buttons or hamburger menu
+- **Fallback**: Use the API key inputs in the main area
+- **Browser**: Try Chrome, Firefox, or Safari
 
 ### Testing Your Setup
 
