@@ -2,3 +2,9 @@ email_venv
 .env
 __pycache__/
 embedding_creator.py
+*.pdf
+.dockerrun
+.dockerignore
+Dockerfile
+*.sh
+*yml
